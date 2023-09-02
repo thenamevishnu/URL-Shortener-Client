@@ -16,7 +16,7 @@ const createShortLink = async (link) => {
 
 const createShortLinkAlias = async (link, alias) => {
     try{
-        const encodedLink = encodeURIComponent(link);
+        const encodedLink = encodeURIComponent(link)
         const {data,status} = await api_call.get(`?url=${encodedLink}&alias=${alias}`)
         if(status===200){
             return data
@@ -28,9 +28,31 @@ const createShortLinkAlias = async (link, alias) => {
     }
 }
 
-export const shortUrl = async (link, alias="") => {
-    const response = alias!=="" ? await createShortLinkAlias(link, alias) : await createShortLink(link)
-    return response
+const createShortLinkDomain = async (link, id, alias="") => {
+    try{
+        const {data} = await server_call.post(`/createLink`,{link,id,alias})
+        if(!data.status){
+            return {alias:"Alias is not available!"}
+        }else{
+            return data.response
+        }
+    }catch(err){
+        console.log(err)
+    }
+}
+
+export const shortUrl = async (link, domain, id, alias="") => {
+    if(domain === "tinyurl"){
+        if(alias!=="")
+            return await createShortLinkAlias(link, alias)
+        else
+            return await createShortLink(link)
+    }else if(domain === window.location.hostname){
+        if(alias!=="")
+            return await createShortLinkDomain(link, id, alias)
+        else
+            return await createShortLinkDomain(link, id)
+    }
 }
 
 export const insertDB = async (insertData, id) => {

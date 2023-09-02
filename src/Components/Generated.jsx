@@ -17,7 +17,7 @@ function Generated({data,setLinkGenerated}) {
     return (
         <>
             <div className="flex justify-center font-mono">
-                <div className='mt-20 p-5 bg-white rounded-xl'>
+                <div className='mt-20 p-5 w-5/12 bg-white rounded-xl'>
                 <h1 className='font-mono text-green-600 text-center text-xl mb-4 font-bold bg-white'>GENERATED SUCCESSFUL</h1>
                     <label className='bg-white text-violet-950 font-semibold'>Long URL:</label>
                     <input type='text' disabled={true} value={data.url} className='w-full mb-3 p-2 outline-none border-2 border-gray-300 bg-white rounded-xl' name='url' id='longUrl'/>
@@ -42,8 +42,8 @@ function Generated({data,setLinkGenerated}) {
                 </div>
             </div>
 
-            <span className='flex justify-center mt-3'>
-                {qrCode && <div className='bg-white p-2'><QRCode value={data.short}/></div>}
+            <span className='flex justify-center mt-7'>
+                {qrCode && <div className='bg-white p-2 rounded-lg'><QRCode value={data.short}/></div>}
             </span>
         </>
     )

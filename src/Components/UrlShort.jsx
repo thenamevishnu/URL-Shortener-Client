@@ -49,7 +49,8 @@ function UrlShort() {
     useEffect(()=>{
         setError({
             url:"",
-            alias:""
+            alias:"",
+            domain:"tinyurl"
         })
     },[formData])
 
@@ -61,7 +62,8 @@ function UrlShort() {
 
     const handleSubmit = async (event) => {
         event.preventDefault()
-        const response = await submitData(formData)
+        const response = await submitData(formData, id)
+        console.log(response);
         if(!response.status){
             if(response.response?.url && response.response?.alias){
                 setError({url:response.response.url,alias:response.response.alias})
@@ -74,6 +76,7 @@ function UrlShort() {
             setError({url:"",alias:""})
             setShortLink(response.response)
             const obj = {longUrl:formData.url,shortUrl:response.response,time: new Date().getTime()}
+            setHistory([...history,obj])
             await insertDB(obj,id)
             setLinkGenerated(true)
         }
@@ -98,18 +101,21 @@ function UrlShort() {
                 <i className='fa fa-sign-out text-white mr-3 cursor-pointer bg-red-700 p-2 rounded-xl' onClick={async () => await logoutSession()}></i>
                 <span className='relative'>
                     <img className='fa fa-sign-out mt-[-0.26rem] w-8 rounded-xl text-white cursor-pointer' src={picture} alt='profile' onMouseEnter={()=>showTitle(true)} onMouseLeave={()=>showTitle(false)}></img>
-                    {title && <p className='absolute top-10 bg-white text-black font-mono p-1 px-2 rounded-xl font-bold'>{name}</p>}
+                    {title && <p className='absolute top-10 bg-white text-black font-mono p-1 px-2 rounded-xl font-bold whitespace-nowrap'>{name}</p>}
                 </span>
             </div>
             {!linkGenerated ?
                 <div className="flex justify-center font-mono">
-                    <form onSubmit={handleSubmit} className='mt-20 p-5 bg-white rounded-xl'>
+                    <form onSubmit={handleSubmit} className='mt-20 w-11/12 md:w-8/12 lg:w-5/12 xl-5/12 p-5 bg-white rounded-xl'>
                         <h1 className='font-mono text-violet-950 text-center text-xl mb-4 font-bold bg-white'>URL SHORTENER</h1>
                         <input type='text' value={formData.url} className='w-full p-2 outline-none border-2 border-gray-300 bg-white rounded-xl' placeholder='Enter Long URL...' name='url' onChange={(e)=>setFormData({...formData,[e.target.name]:e.target.value})}/>
                         {error?.url && <span className='bg-white text-red-600 text-xs'>{error.url}</span>}
                         <div className='bg-white text-violet-950 font-bold mt-3'>Customize Your Link: </div>
                         <div className=' bg-white grid grid-cols-12 gap-3 mt-3'>
-                            <input type='text' disabled={true} className='col-span-7 p-2 outline-none border-2 border-gray-300 bg-gray-300 rounded-xl' value="https://tinyurl.com/"/>
+                            <select defaultValue={formData.domain} className='col-span-7 p-2 outline-none border-2 border-gray-300 bg-white rounded-xl' name='domain' onChange={(e)=>setFormData({...formData,[e.target.name]:e.target.value})}>
+                                <option value={"tinyurl"}>tinyurl</option>
+                                <option value={window.location.hostname}>{window.location.hostname}</option>
+                            </select>
                             <input type='text' value={formData.alias} className='col-span-5 p-2 outline-none border-2 border-gray-300 bg-white rounded-xl' name='alias' placeholder='Enter Alias...' onChange={(e)=>setFormData({...formData,[e.target.name]:e.target.value})}/>
                         </div>
                         {error?.alias && <span className='w-5/12 bg-white text-red-600 text-xs'>{error.alias}</span>}
@@ -119,20 +125,20 @@ function UrlShort() {
                 <Generated data={{...formData,short:shortLink}} setLinkGenerated={setLinkGenerated} showHistory={showHistory}/>
             }
              {historyLoading ? <div className='text-center mt-20'><Loader center={false}/></div> : showHistory && 
-                <div className='w-screen mt-4 grid grid-cols-12 gap-3 mx-auto font-mono px-5'>
+                <div className='w-screen mt-7 grid grid-cols-12 gap-3 mx-auto font-mono px-5'>
                     <div className='col-span-12 font-bold text-xl text-center bg-gray-600 text-white py-1 rounded-xl'>
                         My URL Created History
                     </div>
                     { history?.length > 0 ?
                         history.map(item => { 
                             return(
-                                <div key={item._id} className='my-2 px-5 p-2 text-white col-span-12 lg:col-span-6 font-bold text-base text-start border-2 border-gray-400 rounded-xl'>
+                                <div key={item._id} className='my-2 px-5 p-2 text-white col-span-12 lg:col-span-6 font-bold text-base text-start border-2 border-gray-400 rounded-xl overflow-x-hidden'>
                                     <p className=' whitespace-nowrap'>Long: <span className='text-gray-400'>{item.longUrl}</span></p>
                                     <p className=' whitespace-nowrap'>Short: <span className='text-gray-400'>{item.shortUrl}</span> <i className={copied ? 'fa fa-circle-check text-white cursor-pointer' : 'fa fa-copy text-white cursor-pointer'} onClick={()=>{navigator.clipboard.writeText(item.shortUrl); setCopied(true)}}></i></p>
                                     <p className=' whitespace-nowrap'>Created: <span className='text-gray-400'>{moment(item.time).fromNow()}</span></p>
                                 </div>
                             )
-                        }) : <div className='my-2 px-5 col-span-12 font-bold text-xl text-center border-2 border-gray-400 rounded-xl'>Not Data Found!</div>
+                        }) : <div className='my-2 px-5 p-2 col-span-12 font-bold text-xl text-center border-2 border-gray-400 rounded-xl text-white'>No Data Found!</div>
                     }
                 </div>
             }

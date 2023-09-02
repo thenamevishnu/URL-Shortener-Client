@@ -9,18 +9,19 @@ const urlCheck = async (url) => {
     }
 }
 
-export const submitData = async ({url, alias}) => {
+export const submitData = async ({url, alias, domain},id) => {
     const obj = {}
     if(!isUri(url) || !urlCheck(url)){
         obj.status = false
         obj.response = {url:"Enter a valid url or Include http/https!"}
     }else if(alias === ""){
-        const response = await shortUrl(url)
-        obj.status = response.url==="Enter a valid url!" ? false : true
+        const response = await shortUrl(url,domain,id)
+        console.log(response);
+        obj.status = response?.url==="Enter a valid url!" ? false : true
         obj.response = response
     }else{
-        const response = await shortUrl(url,alias)
-        obj.status = response.alias==="Alias is not available!" || response.url === "Enter a valid url or Include http/https!" ? false : true
+        const response = await shortUrl(url,domain,id,alias)
+        obj.status = response?.alias==="Alias is not available!" || response.url === "Enter a valid url or Include http/https!" ? false : true
         obj.response = response
     }
     return obj

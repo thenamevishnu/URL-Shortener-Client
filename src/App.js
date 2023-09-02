@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import UrlShortPage from './Pages/UrlShortPage'
 import LoginPage from './Pages/LoginPage'
 import { useSelector } from 'react-redux'
+import NavigateTo from './Components/NavigateTo'
 
 function App() {
 
@@ -14,6 +15,7 @@ function App() {
                 <Routes>
                     <Route exact path="/" element={email ? <UrlShortPage/> : <Navigate to={"/login"}/> }/>
                     <Route path="/login" element={email ? <Navigate to={"/"} /> : <LoginPage/>} />
+                    <Route path='/r/:shortKey' element={<NavigateTo/>}/>
                 </Routes>
             </Router>
         </div>
