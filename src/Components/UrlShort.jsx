@@ -41,7 +41,8 @@ function UrlShort() {
     const [shortLink, setShortLink] = useState("")
     const [error,setError] = useState({
         url:"",
-        alias:""
+        alias:"",
+        domain:"tinyurl"
     })
     const [linkGenerated,setLinkGenerated] = useState(false)
     const [showHistory,setShowHistory] = useState(false)
@@ -49,8 +50,7 @@ function UrlShort() {
     useEffect(()=>{
         setError({
             url:"",
-            alias:"",
-            domain:"tinyurl"
+            alias:""
         })
     },[formData])
 
