@@ -23,7 +23,7 @@ function Generated({data,setLinkGenerated}) {
                     <input type='text' disabled={true} value={data.url} className='w-full mb-3 p-2 outline-none border-2 border-gray-300 bg-white rounded-xl' name='url' id='longUrl'/>
                     <label className='bg-white text-violet-950 font-semibold'>Short URL:</label>
                     <input type='text' disabled={true} value={data.short} className='w-full p-2 outline-none border-2 border-gray-300 bg-white rounded-xl'/>
-                    <div className='bg-white mt-4 text-center flex'>
+                    <div className='bg-white mt-4 text-center flex justify-center'>
                         <button className='bg-white mr-3 border-2 border-gray-400 rounded-xl px-3 py-2' onClick={()=>{window.open(data.short,"_blank")}}>
                             <i className='fa fa-link bg-white'></i>
                         </button>
