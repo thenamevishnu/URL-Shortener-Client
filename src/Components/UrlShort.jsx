@@ -36,13 +36,13 @@ function UrlShort() {
     const [history,setHistory] = useState([])
     const [formData,setFormData] = useState({
         url:"",
-        alias:""
+        alias:"",
+        domain:"tinyurl"
     })
     const [shortLink, setShortLink] = useState("")
     const [error,setError] = useState({
         url:"",
-        alias:"",
-        domain:"tinyurl"
+        alias:""
     })
     const [linkGenerated,setLinkGenerated] = useState(false)
     const [showHistory,setShowHistory] = useState(false)
