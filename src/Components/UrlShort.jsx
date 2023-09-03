@@ -76,12 +76,9 @@ function UrlShort() {
             setError({url:"",alias:""})
             setShortLink(response.response)
             const obj = {longUrl:formData.url,shortUrl:response.response,time: new Date().getTime()}
-            const icon = await getFevicon(obj.longUrl)
-            if(icon){
-                obj.icon = icon
-            }
+            const inserted = await insertDB(obj,id)
+            if(inserted.icon) obj.icon = inserted.icon 
             setHistory([obj,...history])
-            await insertDB(obj,id)
             setLinkGenerated(true)
         }
     }
@@ -114,7 +111,7 @@ function UrlShort() {
                         <h1 className='font-mono text-violet-950 text-center text-xl mb-4 font-bold bg-white'>URL SHORTENER</h1>
                         <input type='text' value={formData.url} className='w-full p-2 outline-none border-2 border-gray-300 bg-white rounded-xl' placeholder='Enter Long URL...' name='url' onChange={(e)=>setFormData({...formData,[e.target.name]:e.target.value})}/>
                         {error?.url && <span className='bg-white text-red-600 text-xs'>{error.url}</span>}
-                        <div className='bg-white text-violet-950 font-bold mt-3'>Customize Your Link: </div>
+                        <div className='bg-white text-violet-950 font-bold mt-3'>Customize Your Link: <span className='text-xs font-normal'>( Optional )</span></div>
                         <div className=' bg-white grid grid-cols-12 gap-3 mt-3'>
                             <select defaultValue={formData.domain} className='col-span-7 p-2 outline-none border-2 border-gray-300 bg-white rounded-xl' name='domain' onChange={(e)=>setFormData({...formData,[e.target.name]:e.target.value})}>
                                 <option value={"tinyurl"}>tinyurl</option>
@@ -137,9 +134,11 @@ function UrlShort() {
                         history.map((item) => { 
                             return(
                                 <div key={item.time} className='my-2 px-5 p-2 text-white col-span-12 lg:col-span-6 font-bold text-base text-start border-2 border-gray-400 rounded-xl overflow-x-hidden'>
-                                    {item.icon && <img alt='icon' src={item.icon}/>}
-                                    <p className=' whitespace-nowrap'>Long: <span className='text-gray-400'>{item.longUrl}</span></p>
-                                    <p className=' whitespace-nowrap'>Short: <span className='text-gray-400'>{item.shortUrl}</span> <i className={copied && clicked === item ? 'fa fa-circle-check text-green-700 bg-white rounded-full cursor-pointer' : 'fa fa-copy text-white cursor-pointer'} onClick={()=>{setClicked(item); navigator.clipboard.writeText(item.shortUrl); setCopied(true)}}></i></p>
+                                    <div className='flex'>
+                                    {item.icon && <img alt='icon' className='rounded-full w-6 mr-2' src={item.icon}/>}
+                                    <p className='whitespace-nowrap'>Long: <span className='text-gray-400'>{item.longUrl}</span></p>
+                                    </div>
+                                    <p className=' whitespace-nowrap'><i className={copied && clicked === item ? 'fa fa-circle-check text-green-700 bg-white rounded-full cursor-pointer' : 'fa fa-copy text-white cursor-pointer'} onClick={()=>{setClicked(item); navigator.clipboard.writeText(item.shortUrl); setCopied(true)}}></i> Short: <span className='text-gray-400'>{item.shortUrl}</span></p>
                                     <p className=' whitespace-nowrap'>Created: <span className='text-gray-400'>{moment(item.time).fromNow()}</span></p>
                                 </div>
                             )
