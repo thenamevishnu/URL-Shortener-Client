@@ -125,7 +125,7 @@ function UrlShort() {
                 <div className="flex justify-center font-mono">
                     <form onSubmit={handleSubmit} className='mt-20 w-11/12 md:w-8/12 lg:w-5/12 xl-5/12 p-5 bg-white rounded-xl'>
                         <h1 className='font-mono text-violet-950 text-center text-xl mb-4 font-bold bg-white'>URL SHORTENER</h1>
-                        <input type='text' value={formData.url} className='w-full p-2 outline-none border-2 border-gray-300 bg-white rounded-xl' placeholder='Enter Long URL...' name='url' onChange={(e)=>setFormData({...formData,[e.target.name]:e.target.value})}/>
+                        <input type='text' value={formData.url} autoComplete='off' className='w-full p-2 outline-none border-2 border-gray-300 bg-white rounded-xl' placeholder='Enter Long URL...' name='url' onChange={(e)=>setFormData({...formData,[e.target.name]:e.target.value})}/>
                         {error?.url && <span className='bg-white text-red-600 text-xs'>{error.url}</span>}
                         <div className='bg-white text-violet-950 font-bold mt-3'>Customize Your Link: <span className='text-xs font-normal'>( Optional )</span></div>
                         <div className=' bg-white grid grid-cols-12 gap-3 mt-3'>
@@ -133,7 +133,7 @@ function UrlShort() {
                                 <option value={"tinyurl"}>tinyurl</option>
                                 <option value={window.location.hostname}>{window.location.hostname}</option>
                             </select>
-                            <input type='text' value={formData.alias} className='col-span-5 p-2 outline-none border-2 border-gray-300 bg-white rounded-xl' name='alias' placeholder='Enter Alias...' onChange={(e)=>setFormData({...formData,[e.target.name]:e.target.value})}/>
+                            <input type='text' value={formData.alias} autoComplete='off' className='col-span-5 p-2 outline-none border-2 border-gray-300 bg-white rounded-xl' name='alias' placeholder='Enter Alias...' onChange={(e)=>setFormData({...formData,[e.target.name]:e.target.value})}/>
                         </div>
                         {error?.alias && <span className='w-5/12 bg-white text-red-600 text-xs'>{error.alias}</span>}
                         {generating ? <button type='submit' className='mt-4 w-full bg-green-700 text-white font-mono font-semibold p-2 rounded-xl'><ButtonLoader/></button> : <button type='submit' className='mt-4 w-full bg-green-700 text-white font-mono font-semibold p-2 rounded-xl'>Generate</button>}
