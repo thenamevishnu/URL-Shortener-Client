@@ -1,4 +1,23 @@
+import axios from "axios";
 import server_call, { api_call } from "../axios"
+
+export const getFevicon = async (url) => {
+   
+        const {data} = await axios.get(url)
+        const linkTags = data.match(/<link[^>]*rel=["'](icon|shortcut icon)["'][^>]*>/gi);
+        if (linkTags) {
+            const hrefAttribute = linkTags[0].match(/href=["'](.*?)["']/);
+            if(hrefAttribute) {
+                console.log(hrefAttribute);
+                return {status:true, response: hrefAttribute[1]}
+            } else {
+                return {status:false}
+            }
+        } else {
+            return {status:false}
+        }
+   
+}
 
 const createShortLink = async (link) => {
     try{

@@ -4,7 +4,7 @@ import Generated from './Generated'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { updateUser } from '../Redux/userSlice'
-import { insertDB } from '../Services/shortUrl'
+import { getFevicon, insertDB } from '../Services/shortUrl'
 import { getUserHistory } from '../Services/userFetch'
 import moment from 'moment'
 import Loader from './Loader/Loader'
@@ -46,6 +46,7 @@ function UrlShort() {
     })
     const [linkGenerated,setLinkGenerated] = useState(false)
     const [showHistory,setShowHistory] = useState(false)
+    const [clicked, setClicked] = useState(null)
 
     useEffect(()=>{
         setError({
@@ -63,7 +64,6 @@ function UrlShort() {
     const handleSubmit = async (event) => {
         event.preventDefault()
         const response = await submitData(formData, id)
-        console.log(response);
         if(!response.status){
             if(response.response?.url && response.response?.alias){
                 setError({url:response.response.url,alias:response.response.alias})
@@ -76,7 +76,11 @@ function UrlShort() {
             setError({url:"",alias:""})
             setShortLink(response.response)
             const obj = {longUrl:formData.url,shortUrl:response.response,time: new Date().getTime()}
-            setHistory([...history,obj])
+            const icon = await getFevicon(obj.longUrl)
+            if(icon){
+                obj.icon = icon
+            }
+            setHistory([obj,...history])
             await insertDB(obj,id)
             setLinkGenerated(true)
         }
@@ -130,11 +134,12 @@ function UrlShort() {
                         My URL Created History
                     </div>
                     { history?.length > 0 ?
-                        history.map(item => { 
+                        history.map((item) => { 
                             return(
-                                <div key={item._id} className='my-2 px-5 p-2 text-white col-span-12 lg:col-span-6 font-bold text-base text-start border-2 border-gray-400 rounded-xl overflow-x-hidden'>
+                                <div key={item.time} className='my-2 px-5 p-2 text-white col-span-12 lg:col-span-6 font-bold text-base text-start border-2 border-gray-400 rounded-xl overflow-x-hidden'>
+                                    {item.icon && <img alt='icon' src={item.icon}/>}
                                     <p className=' whitespace-nowrap'>Long: <span className='text-gray-400'>{item.longUrl}</span></p>
-                                    <p className=' whitespace-nowrap'>Short: <span className='text-gray-400'>{item.shortUrl}</span> <i className={copied ? 'fa fa-circle-check text-white cursor-pointer' : 'fa fa-copy text-white cursor-pointer'} onClick={()=>{navigator.clipboard.writeText(item.shortUrl); setCopied(true)}}></i></p>
+                                    <p className=' whitespace-nowrap'>Short: <span className='text-gray-400'>{item.shortUrl}</span> <i className={copied && clicked === item ? 'fa fa-circle-check text-green-700 bg-white rounded-full cursor-pointer' : 'fa fa-copy text-white cursor-pointer'} onClick={()=>{setClicked(item); navigator.clipboard.writeText(item.shortUrl); setCopied(true)}}></i></p>
                                     <p className=' whitespace-nowrap'>Created: <span className='text-gray-400'>{moment(item.time).fromNow()}</span></p>
                                 </div>
                             )
