@@ -4,10 +4,11 @@ import Generated from './Generated'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { updateUser } from '../Redux/userSlice'
-import { getFevicon, insertDB } from '../Services/shortUrl'
-import { getUserHistory } from '../Services/userFetch'
+import { insertDB } from '../Services/shortUrl'
+import { deleteElement, getUserHistory } from '../Services/userFetch'
 import moment from 'moment'
 import Loader from './Loader/Loader'
+import ButtonLoader from './Loader/ButtonLoader'
 
 function UrlShort() {
 
@@ -18,6 +19,7 @@ function UrlShort() {
     const {id, name, picture} = useSelector(state => state.users)
     const [title, showTitle] = useState(false)
     const [copied,setCopied] = useState(false)
+    const [generating,setGenerating] = useState(false)
 
     useEffect(()=>{
         if(copied){
@@ -63,6 +65,7 @@ function UrlShort() {
 
     const handleSubmit = async (event) => {
         event.preventDefault()
+        setGenerating(true)
         const response = await submitData(formData, id)
         if(!response.status){
             if(response.response?.url && response.response?.alias){
@@ -72,20 +75,33 @@ function UrlShort() {
             }else if(response.response?.alias){
                 setError({alias:response.response.alias})
             }
+            setGenerating(false)
+            if(response.response === "navigate") return logoutSession()
         }else{
             setError({url:"",alias:""})
             setShortLink(response.response)
             const obj = {longUrl:formData.url,shortUrl:response.response,time: new Date().getTime()}
             const inserted = await insertDB(obj,id)
-            if(inserted.icon) obj.icon = inserted.icon 
-            setHistory([obj,...history])
+            if(inserted.status){
+                if(inserted === "navigate") return logoutSession()
+                if(inserted.response?.icon) obj.icon = inserted.response.icon 
+                setHistory([obj, ...history])
+            }
+            setGenerating(false)
             setLinkGenerated(true)
         }
     }
 
+    const deleteHistoryElement = async (item) => {
+        const response = await deleteElement(item, id)
+        setHistory(response)
+    }
+
     useEffect(()=>{
         const fetchData = async () => {
-            setHistory(await getUserHistory(id))
+            const info = await getUserHistory(id)
+            if(info === "navigate") return logoutSession()
+            setHistory(info)
             setTimeout(()=>{
                 sethistoryLoading(false)
             },1500)
@@ -120,7 +136,7 @@ function UrlShort() {
                             <input type='text' value={formData.alias} className='col-span-5 p-2 outline-none border-2 border-gray-300 bg-white rounded-xl' name='alias' placeholder='Enter Alias...' onChange={(e)=>setFormData({...formData,[e.target.name]:e.target.value})}/>
                         </div>
                         {error?.alias && <span className='w-5/12 bg-white text-red-600 text-xs'>{error.alias}</span>}
-                        <button type='submit' className='mt-4 w-full bg-green-700 text-white font-mono font-semibold p-2 rounded-xl'>Create</button>
+                        {generating ? <button type='submit' className='mt-4 w-full bg-green-700 text-white font-mono font-semibold p-2 rounded-xl'><ButtonLoader/></button> : <button type='submit' className='mt-4 w-full bg-green-700 text-white font-mono font-semibold p-2 rounded-xl'>Generate</button>}
                     </form>
                 </div> : 
                 <Generated data={{...formData,short:shortLink}} setLinkGenerated={setLinkGenerated} showHistory={showHistory}/>
@@ -131,15 +147,19 @@ function UrlShort() {
                         My URL Created History
                     </div>
                     { history?.length > 0 ?
-                        history.map((item) => { 
+                        history?.map(item => { 
                             return(
-                                <div key={item.time} className='my-2 px-5 p-2 text-white col-span-12 lg:col-span-6 font-bold text-base text-start border-2 border-gray-400 rounded-xl overflow-x-hidden'>
+                                <div key={item.time} className='relative my-2 px-5 p-2 text-white col-span-12 lg:col-span-6 font-bold text-base text-start border-2 border-gray-400 rounded-xl overflow-x-hidden'>
                                     <div className='flex'>
-                                    {item.icon && <img alt='icon' className='rounded-full w-6 mr-2' src={item.icon}/>}
+                                    {item.icon && <img alt='icon' className='rounded-full w-6 h-6 mr-2' src={item.icon}/>}
                                     <p className='whitespace-nowrap'>Long: <span className='text-gray-400'>{item.longUrl}</span></p>
                                     </div>
-                                    <p className=' whitespace-nowrap'><i className={copied && clicked === item ? 'fa fa-circle-check text-green-700 bg-white rounded-full cursor-pointer' : 'fa fa-copy text-white cursor-pointer'} onClick={()=>{setClicked(item); navigator.clipboard.writeText(item.shortUrl); setCopied(true)}}></i> Short: <span className='text-gray-400'>{item.shortUrl}</span></p>
+                                    <p className=' whitespace-nowrap'>Short: <span className='text-gray-400'>{item.shortUrl}</span></p>
                                     <p className=' whitespace-nowrap'>Created: <span className='text-gray-400'>{moment(item.time).fromNow()}</span></p>
+                                    <span className='absolute bottom-1 right-1'>
+                                        <i className='fa fa-trash text-red-500 cursor-pointer mr-2' onClick={async ()=>await deleteHistoryElement(item)}></i>
+                                        <i className={copied && clicked === item ? 'fa fa-circle-check text-green-700 bg-white rounded-full cursor-pointer' : 'fa fa-copy text-white cursor-pointer'} onClick={()=>{setClicked(item); navigator.clipboard.writeText(item.shortUrl); setCopied(true)}}></i>
+                                    </span>
                                 </div>
                             )
                         }) : <div className='my-2 px-5 p-2 col-span-12 font-bold text-xl text-center border-2 border-gray-400 rounded-xl text-white'>No Data Found!</div>

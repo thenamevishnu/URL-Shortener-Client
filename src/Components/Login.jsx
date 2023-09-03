@@ -24,8 +24,8 @@ function Login() {
     }
 
     return (
-        <div className="flex justify-center h-screen items-center font-mono">
-            <GoogleLogin size="medium" theme="filled_black"
+        <div className="flex justify-center h-screen items-center font-mono ">
+            <GoogleLogin size="medium"
                 onSuccess={async (credentialResponse) => {
                     await sendData(credentialResponse)
                 }}

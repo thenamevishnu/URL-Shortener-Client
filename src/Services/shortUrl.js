@@ -1,9 +1,11 @@
+import { toast } from "react-hot-toast";
 import server_call, { api_call } from "../axios"
 
 const createShortLink = async (link) => {
     try{
         const encodedLink = encodeURIComponent(link);
-        const {data,status} = await api_call.get(`?url=${encodedLink}`)
+        const token = localStorage.getItem("userDB") ? JSON.parse(localStorage.getItem("userDB")).token : null
+        const {data,status} = token ? await api_call.get(`?url=${encodedLink}`) : {data:"navigate", status: 200}
         if(status===200){
             return data
         }else{
@@ -17,7 +19,8 @@ const createShortLink = async (link) => {
 const createShortLinkAlias = async (link, alias) => {
     try{
         const encodedLink = encodeURIComponent(link)
-        const {data,status} = await api_call.get(`?url=${encodedLink}&alias=${alias}`)
+        const token = localStorage.getItem("userDB") ? JSON.parse(localStorage.getItem("userDB")).token : null
+        const {data,status} = token ? await api_call.get(`?url=${encodedLink}&alias=${alias}`) : {data:"navigate", status: 200}
         if(status===200){
             return data
         }else{
@@ -31,13 +34,16 @@ const createShortLinkAlias = async (link, alias) => {
 const createShortLinkDomain = async (link, id, alias="") => {
     try{
         const {data} = await server_call.post(`/createLink`,{link,id,alias})
+        if(data.error){
+            return "navigate"
+        }
         if(!data.status){
             return {alias:"Alias is not available!"}
         }else{
             return data.response
         }
     }catch(err){
-        console.log(err)
+        toast.error(err)
     }
 }
 
@@ -58,8 +64,9 @@ export const shortUrl = async (link, domain, id, alias="") => {
 export const insertDB = async (insertData, id) => {
     try{
         const {data} = await server_call.post(`/insertHistory`,{insertData, id})
+        if(data.error) return "navigate"
         return data
     }catch(err){
-        console.log(err)
+        toast.error(err)
     }
 }

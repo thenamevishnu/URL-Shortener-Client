@@ -4,6 +4,7 @@ import UrlShortPage from './Pages/UrlShortPage'
 import LoginPage from './Pages/LoginPage'
 import { useSelector } from 'react-redux'
 import NavigateTo from './Components/NavigateTo'
+import { Toaster } from 'react-hot-toast';
 
 function App() {
 
@@ -18,6 +19,10 @@ function App() {
                     <Route path='/r/:shortKey' element={<NavigateTo/>}/>
                 </Routes>
             </Router>
+            <Toaster
+                position="top-center"
+                reverseOrder={false}
+            />
         </div>
     )
 }

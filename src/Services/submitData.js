@@ -16,12 +16,11 @@ export const submitData = async ({url, alias, domain},id) => {
         obj.response = {url:"Enter a valid url or Include http/https!"}
     }else if(alias === ""){
         const response = await shortUrl(url,domain,id)
-        console.log(response);
-        obj.status = response?.url==="Enter a valid url!" ? false : true
+        obj.status = response?.url==="Enter a valid url or Include http/https!" || response === "navigate" ? false : true
         obj.response = response
     }else{
         const response = await shortUrl(url,domain,id,alias)
-        obj.status = response?.alias==="Alias is not available!" || response.url === "Enter a valid url or Include http/https!" ? false : true
+        obj.status = response?.alias==="Alias is not available!" || response.url === "Enter a valid url or Include http/https!" || response === "navigate" ? false : true
         obj.response = response
     }
     return obj
