@@ -33,6 +33,12 @@ const createShortLinkAlias = async (link, alias) => {
 
 const createShortLinkDomain = async (link, id, alias="") => {
     try{
+        if(alias){
+            const exp = /^[a-zA-Z0-9]+$/igm
+            if(!exp.test(alias)){
+                return {alias:"Alias is not available!"}
+            }
+        }
         const {data} = await server_call.post(`/createLink`,{link,id,alias})
         if(data.error){
             return "navigate"
