@@ -143,13 +143,13 @@ function UrlShort() {
             }
              {historyLoading ? <div className='text-center mt-20'><Loader center={false}/></div> : showHistory && 
                 <div className='w-screen mt-7 grid grid-cols-12 gap-3 mx-auto font-mono px-5'>
-                    <div className='col-span-12 font-bold text-xl text-center bg-gray-600 text-white py-1 rounded-xl'>
+                    <div className='col-span-12 w-auto p-1 px-2 mx-auto font-bold text-lg text-center bg-violet-600 text-gray-200 py-1 rounded-xl'>
                         My URL Created History
                     </div>
                     { history?.length > 0 ?
                         history?.map(item => { 
                             return(
-                                <div key={item.time} className='relative my-2 px-5 p-2 text-white col-span-12 lg:col-span-6 font-bold text-base text-start border-2 border-gray-400 rounded-xl overflow-x-hidden'>
+                                <div key={item.time} className='relative my-2 px-5 p-2 text-white col-span-12 lg:col-span-6 font-bold text-base text-start border-gray-700 border-2 rounded-xl overflow-x-hidden'>
                                     <div className='flex'>
                                     {item.icon && <img alt='icon' className='rounded-full w-6 h-6 mr-2' src={item.icon}/>}
                                     <p className='whitespace-nowrap'>Long: <span className='text-gray-400'>{item.longUrl}</span></p>
@@ -157,7 +157,7 @@ function UrlShort() {
                                     <p className=' whitespace-nowrap'>Short: <span className='text-gray-400'>{item.shortUrl}</span></p>
                                     <p className=' whitespace-nowrap'>Created: <span className='text-gray-400'>{moment(item.time).fromNow()}</span></p>
                                     <span className='absolute bottom-1 right-1'>
-                                        <i className='fa fa-trash text-red-500 cursor-pointer mr-2' onClick={async ()=>await deleteHistoryElement(item)}></i>
+                                        <i className='fa fa-trash text-red-500 cursor-pointer mr-4' onClick={async ()=>await deleteHistoryElement(item)}></i>
                                         <i className={copied && clicked === item ? 'fa fa-circle-check text-green-700 bg-white rounded-full cursor-pointer' : 'fa fa-copy text-white cursor-pointer'} onClick={()=>{setClicked(item); navigator.clipboard.writeText(item.shortUrl); setCopied(true)}}></i>
                                     </span>
                                 </div>
