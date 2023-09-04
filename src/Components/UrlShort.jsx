@@ -102,12 +102,10 @@ function UrlShort() {
             const info = await getUserHistory(id)
             if(info === "navigate") return logoutSession()
             setHistory(info)
-            setTimeout(()=>{
-                sethistoryLoading(false)
-            },1500)
+            sethistoryLoading(false)
         }
         showHistory && fetchData()
-    },[showHistory, id])
+    },[showHistory])
 
     return (
         <>
