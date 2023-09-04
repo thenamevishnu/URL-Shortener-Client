@@ -32,7 +32,7 @@ function UrlShort() {
     useEffect(()=>{
         setTimeout(() => {
             setLoading(false)
-        }, 2000);
+        }, 1000);
     },[])
 
     const [history,setHistory] = useState([])
@@ -102,7 +102,9 @@ function UrlShort() {
             const info = await getUserHistory(id)
             if(info === "navigate") return logoutSession()
             setHistory(info)
-            sethistoryLoading(false)
+            setTimeout(()=>{
+                sethistoryLoading(false)
+            },500)
         }
         showHistory && fetchData()
     },[showHistory])
